@@ -7,7 +7,8 @@ import { AuthProvider, AuthContext } from "./context/AuthContext";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import { Toaster } from "react-hot-toast";
-
+import Projects from "./pages/Projects.tsx";
+import Home from "./pages/Home.tsx";
 // ✅ Inline ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, loading } = useContext(AuthContext);
@@ -24,15 +25,21 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Protected layout */}
           <Route
-            path="/*"
+            path="/"
             element={
               <ProtectedRoute>
                 <App />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<Home />} /> {/* / */}
+            <Route path="projects" element={<Projects />} /> {/* /projects */}
+          </Route>
         </Routes>
+
         <Toaster position="top-right" reverseOrder={false} />
       </AuthProvider>
     </BrowserRouter>

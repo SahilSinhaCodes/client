@@ -25,7 +25,7 @@ const Login = () => {
       login(token, user);
 
       toast.success("Logged in successfully!"); // ✅ use toast
-      navigate("/home");
+      navigate("/");
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || "Login failed";
       setError(errorMsg);

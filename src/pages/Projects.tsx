@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const Projects = () => {
   const { user, token } = useAuth();
@@ -102,18 +103,19 @@ const Projects = () => {
       ) : (
         <div className="space-y-4">
           {projects.map((project: any) => (
-            <div
+            <Link
               key={project._id}
-              className="border border-gray-700 p-4 rounded bg-gray-800"
+              to={`/projects/${project._id}`}
+              className="block border border-gray-700 p-4 rounded bg-gray-800 hover:bg-gray-700 transition"
             >
               <h2 className="text-xl font-semibold">{project.title}</h2>
               <p className="text-gray-400">{project.description}</p>
               <p className="text-sm mt-2">
                 Members:{" "}
                 {project.teamMembers?.map((m: any) => m.name).join(", ") || "No members"}
-
               </p>
-            </div>
+            </Link>
+
           ))}
         </div>
       )}

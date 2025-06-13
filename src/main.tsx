@@ -9,6 +9,12 @@ import Register from "./components/Auth/Register";
 import { Toaster } from "react-hot-toast";
 import Projects from "./pages/Projects.tsx";
 import Home from "./pages/Home.tsx";
+import Tickets from "./pages/Tickets.tsx";
+import ProjectDetails from "./pages/ProjectDetails";
+
+// Inside your Routes:
+
+
 // ✅ Inline ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { token, loading } = useContext(AuthContext);
@@ -35,8 +41,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               </ProtectedRoute>
             }
           >
-            <Route index element={<Home />} /> {/* / */}
-            <Route path="projects" element={<Projects />} /> {/* /projects */}
+            <Route index element={<Home />} />
+            <Route path="projects" element={<Projects />} />
+            <Route path="projects/:id" element={<ProjectDetails />} />
+            <Route path="projects/:id/tickets" element={<Tickets />} />
           </Route>
         </Routes>
 

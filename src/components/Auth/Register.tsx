@@ -32,7 +32,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-stone-900 text-white flex items-center justify-center">
       <form onSubmit={handleSubmit} className="space-y-4 bg-gray-900 p-8 rounded-lg shadow-xl w-full max-w-sm">
         <h2 className="text-xl font-bold">Register</h2>
         <p className="text-sm text-gray-400 mt-2">

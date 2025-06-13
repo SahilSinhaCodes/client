@@ -68,28 +68,31 @@ const Projects = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
+    <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">Projects</h1>
 
       {/* Create new project */}
-      <form onSubmit={handleCreate} className="mb-6">
+      <form
+        onSubmit={handleCreate}
+        className="mb-8 flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-2 sm:space-y-0"
+      >
         <input
           type="text"
           placeholder="Project Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="p-2 mr-2 rounded bg-gray-800 border border-gray-700"
+          className="p-2 rounded bg-gray-800 border border-gray-700 w-full sm:w-auto"
         />
         <input
           type="text"
           placeholder="Description (optional)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="p-2 mr-2 rounded bg-gray-800 border border-gray-700"
+          className="p-2 rounded bg-gray-800 border border-gray-700 w-full sm:w-auto"
         />
         <button
           type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded"
+          className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded w-full sm:w-auto"
         >
           Create Project
         </button>
@@ -108,19 +111,19 @@ const Projects = () => {
               to={`/projects/${project._id}`}
               className="block border border-gray-700 p-4 rounded bg-gray-800 hover:bg-gray-700 transition"
             >
-              <h2 className="text-xl font-semibold">{project.title}</h2>
-              <p className="text-gray-400">{project.description}</p>
-              <p className="text-sm mt-2">
+              <h2 className="text-xl font-semibold mb-1">{project.title}</h2>
+              <p className="text-gray-400 mb-2">{project.description}</p>
+              <p className="text-sm text-gray-500">
                 Members:{" "}
                 {project.teamMembers?.map((m: any) => m.name).join(", ") || "No members"}
               </p>
             </Link>
-
           ))}
         </div>
       )}
     </div>
   );
+
 };
 
 export default Projects;

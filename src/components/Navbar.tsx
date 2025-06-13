@@ -12,7 +12,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-800 text-white p-4 shadow-md flex justify-between items-center">
+    <nav className="bg-slate-950 text-white p-4 shadow-md flex justify-between items-center">
       <div className="flex items-center gap-6">
         <Link to="/" className="text-lg font-bold hover:text-gray-300">
           Bug Tracker

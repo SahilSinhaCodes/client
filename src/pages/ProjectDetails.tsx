@@ -7,16 +7,23 @@ interface Project {
   _id: string;
   title: string;
   description: string;
+  createdBy: string; // <- add this
   teamMembers: { _id: string; name: string; email: string }[];
 }
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // NEW STATE + INPUT
+  const [newMemberEmail, setNewMemberEmail] = useState("");
+  const [addError, setAddError] = useState("");
+  const [addSuccess, setAddSuccess] = useState("");
+  const [removeError, setRemoveError] = useState("");
+  const [removeSuccess, setRemoveSuccess] = useState("");
 
   useEffect(() => {
     const fetchProject = async () => {
@@ -38,6 +45,43 @@ const ProjectDetails = () => {
     fetchProject();
   }, [id]);
 
+  const handleAddMember = async () => {
+    if (!newMemberEmail) return;
+    setAddError("");
+    setAddSuccess("");
+
+    try {
+      const res = await axios.put(
+        `/api/projects/${project?._id}/add-member`,
+        { email: newMemberEmail },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProject(res.data.project); // update team
+      setNewMemberEmail("");
+      setAddSuccess("Member added successfully!");
+    } catch (err: any) {
+      setAddError(err.response?.data?.message || "Failed to add member");
+    }
+  };
+
+  const handleRemoveMember = async (userId: string) => {
+    setRemoveError("");
+    setRemoveSuccess("");
+
+    try {
+      const res = await axios.put(
+        `/api/projects/${project?._id}/remove-member`,
+        { userId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProject(res.data.project); // update state
+      setRemoveSuccess("Member removed");
+    } catch (err: any) {
+      setRemoveError(err.response?.data?.message || "Failed to remove member");
+    }
+  };
+
+
   if (loading) return <p className="text-center">Loading project...</p>;
   if (!project) return <p className="text-center text-red-500">Project not found.</p>;
 
@@ -50,11 +94,42 @@ const ProjectDetails = () => {
         <h2 className="text-xl font-semibold">Team Members:</h2>
         <ul className="list-disc list-inside text-gray-300">
           {project.teamMembers.map((member) => (
-            <li key={member._id}>
-              {member.name} ({member.email})
+            <li key={member._id} className="flex justify-between items-center">
+              <span>
+                {member.name} ({member.email})
+              </span>
+              <button
+                onClick={() => handleRemoveMember(member._id)}
+                className="text-red-400 hover:text-red-600 text-sm"
+              >
+                Remove
+              </button>
             </li>
           ))}
+
         </ul>
+
+        {/* ADD MEMBER SECTION */}
+        <div className="mt-4">
+          <h3 className="font-semibold mb-1">Add Member by Email:</h3>
+          <div className="flex items-center gap-2">
+            <input
+              type="email"
+              value={newMemberEmail}
+              onChange={(e) => setNewMemberEmail(e.target.value)}
+              placeholder="Enter email"
+              className="px-3 py-1 rounded bg-slate-800 text-white border border-slate-600 w-full max-w-xs"
+            />
+            <button
+              onClick={handleAddMember}
+              className="bg-green-600 px-3 py-1.5 rounded hover:bg-green-700"
+            >
+              Add
+            </button>
+          </div>
+          {addSuccess && <p className="text-green-400 text-sm mt-1">{addSuccess}</p>}
+          {addError && <p className="text-red-500 text-sm mt-1">{addError}</p>}
+        </div>
       </div>
 
       <div className="flex gap-4">

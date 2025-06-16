@@ -11,6 +11,8 @@ import Projects from "./pages/Projects.tsx";
 import Home from "./pages/Home.tsx";
 import Tickets from "./pages/Tickets.tsx";
 import ProjectDetails from "./pages/ProjectDetails";
+import TicketDetail from "./pages/TicketDetail";
+
 
 // Inside your Routes:
 
@@ -45,6 +47,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="projects" element={<Projects />} />
             <Route path="projects/:id" element={<ProjectDetails />} />
             <Route path="projects/:id/tickets" element={<Tickets />} />
+            <Route path="/tickets/:ticketId" element={<TicketDetail />} />
           </Route>
         </Routes>
 

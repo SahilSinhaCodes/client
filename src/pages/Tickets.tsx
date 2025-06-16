@@ -3,6 +3,10 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import KanbanBoard from "../components/Tickets/KanbanBoard"; // create this next
+import { useNavigate } from "react-router-dom";
+
+
+
 
 interface Ticket {
   _id: string;
@@ -23,7 +27,7 @@ const Tickets = () => {
   const { token } = useAuth();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Low");
@@ -127,19 +131,20 @@ const Tickets = () => {
                 {tickets.map((ticket) => (
                   <div
                     key={ticket._id}
-                    className="bg-gray-800 p-4 rounded shadow border border-gray-700"
+                    className="bg-gray-800 p-4 rounded shadow border border-gray-700 cursor-pointer hover:bg-gray-700"
+                    onClick={() => navigate(`/tickets/${ticket._id}`)}
                   >
                     <h3 className="text-lg font-semibold">{ticket.title}</h3>
                     <p className="text-gray-400">{ticket.description}</p>
                     <p className="text-sm mt-2">
                       <strong>Status:</strong> {ticket.status} |{" "}
                       <strong>Priority:</strong> {ticket.priority} |{" "}
-                      <strong>Assignee:</strong>{" "}
-                      {ticket.assignee?.name || "Unassigned"} |{" "}
+                      <strong>Assignee:</strong> {ticket.assignee?.name || "Unassigned"} |{" "}
                       <strong>Created:</strong>{" "}
                       {new Date(ticket.createdAt).toLocaleString()}
                     </p>
                   </div>
+
                 ))}
               </div>
             )}

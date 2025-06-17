@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 
@@ -10,6 +10,11 @@ interface Ticket {
   priority: string;
   status: string;
   assignee?: {
+    name: string;
+    email: string;
+  };
+  createdBy: {
+    _id: string;
     name: string;
     email: string;
   };
@@ -29,14 +34,18 @@ interface Comment {
 
 const TicketDetail = () => {
   const { ticketId } = useParams();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const navigate = useNavigate();
+
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
+  const [editOpen, setEditOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
+      console.log("Fetching ticket and comments for ticketId:", ticketId);
       try {
         const [ticketRes, commentsRes] = await Promise.all([
           axios.get(`/api/tickets/${ticketId}`, {
@@ -46,6 +55,8 @@ const TicketDetail = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
+        console.log("Ticket fetched:", ticketRes.data);
+        console.log("Comments fetched:", commentsRes.data);
         setTicket(ticketRes.data);
         setComments(commentsRes.data);
       } catch (err) {
@@ -66,6 +77,7 @@ const TicketDetail = () => {
         { ticketId, text: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log("Comment added:", res.data);
       setComments((prev) => [...prev, res.data]);
       setNewComment("");
     } catch (err) {
@@ -78,18 +90,50 @@ const TicketDetail = () => {
       await axios.delete(`/api/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Comment deleted:", commentId);
       setComments((prev) => prev.filter((c) => c._id !== commentId));
     } catch (err) {
       console.error("Failed to delete comment", err);
     }
   };
 
+  const handleUpdateTicket = async () => {
+    if (!ticket) return;
+    try {
+      const res = await axios.put(`/api/tickets/${ticket._id}`, ticket, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Ticket updated:", res.data);
+      // Preserve createdBy to avoid losing isOwner check
+      setTicket({
+        ...res.data,
+        createdBy: ticket.createdBy,
+      });
+      setEditOpen(false);
+    } catch (err) {
+      console.error("Failed to update ticket", err);
+    }
+  };
+  
+
   if (loading) return <div className="p-6 text-white">Loading...</div>;
   if (!ticket) return <div className="p-6 text-white">Ticket not found</div>;
 
+  const isOwner = user?.id === ticket.createdBy._id;
+  console.log("Current user:", user);
+  console.log("Is Owner:", isOwner);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">{ticket.title}</h1>
+      <div className="flex justify-between items-start mb-4">
+        <h1 className="text-3xl font-bold">{ticket.title}</h1>
+        {isOwner && (
+          <button onClick={() => setEditOpen(true)} className="bg-yellow-600 px-3 py-1 rounded">
+            Edit
+          </button>
+        )}
+      </div>
+
       <p className="mb-2">{ticket.description}</p>
       <p className="text-sm text-gray-400 mb-4">
         Priority: {ticket.priority} | Status: {ticket.status} | Created:{" "}
@@ -111,12 +155,14 @@ const TicketDetail = () => {
               {comment.userId.name} • {new Date(comment.createdAt).toLocaleString()}
             </p>
             <p>{comment.text}</p>
-            {comment.userId._id === useAuth().user?.id && (
-              <button onClick={() => handleDeleteComment(comment._id)} className="text-red-400 text-xs mt-1">
+            {comment.userId._id === user?.id && (
+              <button
+                onClick={() => handleDeleteComment(comment._id)}
+                className="text-red-400 text-xs mt-1"
+              >
                 Delete
               </button>
             )}
-
           </div>
         ))}
       </div>
@@ -136,6 +182,51 @@ const TicketDetail = () => {
           Post
         </button>
       </div>
+
+      {/* Edit Modal */}
+      {editOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded shadow max-w-md w-full border border-gray-700">
+            <h2 className="text-xl mb-4">Edit Ticket</h2>
+            <input
+              className="w-full p-2 mb-2 bg-gray-800 border border-gray-700 rounded"
+              value={ticket.title}
+              onChange={(e) => setTicket({ ...ticket, title: e.target.value })}
+            />
+            <textarea
+              className="w-full p-2 mb-2 bg-gray-800 border border-gray-700 rounded"
+              value={ticket.description}
+              onChange={(e) => setTicket({ ...ticket, description: e.target.value })}
+            />
+            <select
+              className="w-full p-2 mb-2 bg-gray-800 border border-gray-700 rounded"
+              value={ticket.priority}
+              onChange={(e) => setTicket({ ...ticket, priority: e.target.value })}
+            >
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+            <select
+              className="w-full p-2 mb-4 bg-gray-800 border border-gray-700 rounded"
+              value={ticket.status}
+              onChange={(e) => setTicket({ ...ticket, status: e.target.value })}
+            >
+              <option value="todo">To Do</option>
+              <option value="in-progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setEditOpen(false)} className="text-gray-400">
+                Cancel
+              </button>
+              <button onClick={handleUpdateTicket} className="bg-blue-600 px-4 py-2 rounded">
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

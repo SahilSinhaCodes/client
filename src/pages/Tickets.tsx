@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
-import KanbanBoard from "../components/Tickets/KanbanBoard"; // create this next
-import { useNavigate } from "react-router-dom";
-
-
-
+import KanbanBoard from "../components/Tickets/KanbanBoard";
 
 interface Ticket {
   _id: string;
@@ -28,17 +24,35 @@ const Tickets = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("Low");
   const [assigneeEmail, setAssigneeEmail] = useState("");
 
-  useEffect(() => {
-    const fetchTickets = async () => {
+  // Filters & search
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
+
+  const fetchTickets = async (
+      searchTerm: string,
+      status: string,
+      priority: string
+    ) => {
       try {
-        const res = await axios.get(`/api/tickets/project/${projectId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        setLoading(true);
+        const query = new URLSearchParams();
+        if (searchTerm) query.append("search", searchTerm);
+        if (status) query.append("status", status);
+        if (priority) query.append("priority", priority);
+
+        const res = await axios.get(
+          `/api/tickets/project/${projectId}?${query.toString()}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setTickets(res.data);
       } catch (err) {
         console.error("Failed to load tickets:", err);
@@ -47,8 +61,12 @@ const Tickets = () => {
       }
     };
 
-    if (projectId) fetchTickets();
-  }, [projectId, token]);
+    useEffect(() => {
+      if (projectId) {
+        fetchTickets(search, statusFilter, priorityFilter);
+      }
+    }, [projectId, search, statusFilter, priorityFilter]);
+
 
   const handleCreateTicket = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,6 +140,61 @@ const Tickets = () => {
         <div className="md:col-span-2 space-y-8">
           <div>
             <h2 className="text-xl font-semibold mb-2">Ticket List</h2>
+
+            {/* 🔍 Filter UI */}
+            <div className="mb-4 flex flex-wrap gap-2 items-center">
+              <input
+                type="text"
+                placeholder="Search by title..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="p-2 rounded bg-gray-800 border border-gray-700 text-white"
+              />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="p-2 rounded bg-gray-800 border border-gray-700 text-white"
+              >
+                <option value="">All Status</option>
+                <option value="todo">To Do</option>
+                <option value="in-progress">In Progress</option>
+                <option value="done">Done</option>
+              </select>
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="p-2 rounded bg-gray-800 border border-gray-700 text-white"
+              >
+                <option value="">All Priority</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+              </select>
+              <div className="flex gap-2">
+  <button
+    onClick={() => {
+      // This is optional now – useEffect auto-fires
+      fetchTickets(search, statusFilter, priorityFilter);
+    }}
+    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white"
+  >
+    Apply Filters
+  </button>
+  <button
+    onClick={() => {
+      setSearch("");
+      setStatusFilter("");
+      setPriorityFilter("");
+      // No need to manually call fetchTickets – useEffect handles it
+    }}
+    className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white"
+  >
+    Reset
+  </button>
+              </div>
+              
+            </div>
+
             {loading ? (
               <p>Loading...</p>
             ) : tickets.length === 0 ? (
@@ -139,12 +212,12 @@ const Tickets = () => {
                     <p className="text-sm mt-2">
                       <strong>Status:</strong> {ticket.status} |{" "}
                       <strong>Priority:</strong> {ticket.priority} |{" "}
-                      <strong>Assignee:</strong> {ticket.assignee?.name || "Unassigned"} |{" "}
+                      <strong>Assignee:</strong>{" "}
+                      {ticket.assignee?.name || "Unassigned"} |{" "}
                       <strong>Created:</strong>{" "}
                       {new Date(ticket.createdAt).toLocaleString()}
                     </p>
                   </div>
-
                 ))}
               </div>
             )}

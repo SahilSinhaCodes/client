@@ -43,6 +43,23 @@ const TicketDetail = () => {
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const handleDeleteTicket = async () => {
+    if (!ticket) return;
+    try {
+      console.log("Deleting ticket:", ticket._id);
+      await axios.delete(`/api/tickets/${ticket._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Ticket deleted. Redirecting...");
+      navigate(`/projects/${ticket.projectId}/tickets`);
+    } catch (err) {
+      console.error("Failed to delete ticket", err);
+    }
+  };
+
+
   useEffect(() => {
     const fetchDetails = async () => {
       console.log("Fetching ticket and comments for ticketId:", ticketId);
@@ -128,10 +145,16 @@ const TicketDetail = () => {
       <div className="flex justify-between items-start mb-4">
         <h1 className="text-3xl font-bold">{ticket.title}</h1>
         {isOwner && (
-          <button onClick={() => setEditOpen(true)} className="bg-yellow-600 px-3 py-1 rounded">
-            Edit
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setEditOpen(true)} className="bg-yellow-600 px-3 py-1 rounded">
+              Edit
+            </button>
+            <button onClick={() => setShowDeleteConfirm(true)} className="bg-red-600 px-3 py-1 rounded">
+              Delete
+            </button>
+          </div>
         )}
+
       </div>
 
       <p className="mb-2">{ticket.description}</p>
@@ -227,6 +250,23 @@ const TicketDetail = () => {
           </div>
         </div>
       )}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-900 p-6 rounded shadow max-w-md w-full border border-gray-700">
+            <h2 className="text-xl mb-4">Confirm Deletion</h2>
+            <p className="mb-4 text-gray-300">Are you sure you want to delete this ticket?</p>
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setShowDeleteConfirm(false)} className="text-gray-400">
+                Cancel
+              </button>
+              <button onClick={handleDeleteTicket} className="bg-red-600 px-4 py-2 rounded">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 };

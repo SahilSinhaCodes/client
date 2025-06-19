@@ -4,6 +4,17 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  teamMembers: {
+    _id: string;
+    name: string;
+    email: string;
+  }[];
+}
+
 const Projects = () => {
   const { token } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);

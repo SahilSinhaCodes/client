@@ -4,12 +4,13 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import KanbanBoard from "../components/Tickets/KanbanBoard";
 
+type Status = "todo" | "in-progress" | "done";
 interface Ticket {
   _id: string;
   title: string;
   description: string;
   priority: string;
-  status: string;
+  status: Status;
   assignee: {
     _id: string;
     name: string;

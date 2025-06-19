@@ -35,7 +35,7 @@ const statusLabels: Record<(typeof statusColumns)[number], string> = {
   "done": "Done",
 };
 
-const KanbanBoard = ({ tickets, setTickets, projectId }: Props) => {
+const KanbanBoard = ({ tickets, setTickets}: Props) => {
   const { token } = useAuth();
 
   const onDragEnd = async (result: DropResult) => {

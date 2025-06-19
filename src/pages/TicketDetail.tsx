@@ -52,7 +52,7 @@ const TicketDetail = () => {
     if (!ticket) return;
     try {
       console.log("Deleting ticket:", ticket._id);
-      await axios.delete(`/api/tickets/${ticket._id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_BASE}/api/tickets/${ticket._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Ticket deleted. Redirecting...");
@@ -68,10 +68,10 @@ const TicketDetail = () => {
       console.log("Fetching ticket and comments for ticketId:", ticketId);
       try {
         const [ticketRes, commentsRes] = await Promise.all([
-          axios.get(`/api/tickets/${ticketId}`, {
+          axios.get(`${import.meta.env.VITE_API_BASE}/api/tickets/${ticketId}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get(`/api/comments/ticket/${ticketId}`, {
+          axios.get(`${import.meta.env.VITE_API_BASE}/api/comments/ticket/${ticketId}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -93,7 +93,7 @@ const TicketDetail = () => {
     if (!newComment.trim()) return;
     try {
       const res = await axios.post(
-        "/api/comments",
+        `${import.meta.env.VITE_API_BASE}/api/comments`,
         { ticketId, text: newComment },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -107,7 +107,7 @@ const TicketDetail = () => {
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      await axios.delete(`/api/comments/${commentId}`, {
+      await axios.delete(`${import.meta.env.VITE_API_BASE}/api/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Comment deleted:", commentId);
@@ -120,7 +120,7 @@ const TicketDetail = () => {
   const handleUpdateTicket = async () => {
     if (!ticket) return;
     try {
-      const res = await axios.put(`/api/tickets/${ticket._id}`, ticket, {
+      const res = await axios.put(`${import.meta.env.VITE_API_BASE}/api/tickets/${ticket._id}`, ticket, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Ticket updated:", res.data);
@@ -190,7 +190,7 @@ const TicketDetail = () => {
 
           try {
             const res = await axios.post(
-              `/api/tickets/${ticket._id}/upload-image`,
+              `${import.meta.env.VITE_API_BASE}/api/tickets/${ticket._id}/upload-image`,
               formData,
               {
                 headers: {

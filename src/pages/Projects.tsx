@@ -54,7 +54,7 @@ const Projects = () => {
 
     try {
       const res = await axios.post(
-        "/api/projects",
+        `${import.meta.env.VITE_API_BASE}/api/projects`,
         { title, description },
         {
           headers: {

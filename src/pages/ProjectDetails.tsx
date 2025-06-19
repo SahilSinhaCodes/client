@@ -28,7 +28,7 @@ const ProjectDetails = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const res = await axios.get(`/api/projects/${id}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/projects/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -52,7 +52,7 @@ const ProjectDetails = () => {
 
     try {
       const res = await axios.put(
-        `/api/projects/${project?._id}/add-member`,
+        `${import.meta.env.VITE_API_BASE}/api/projects/${project?._id}/add-member`,
         { email: newMemberEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -70,7 +70,7 @@ const ProjectDetails = () => {
 
     try {
       const res = await axios.put(
-        `/api/projects/${project?._id}/remove-member`,
+        `${import.meta.env.VITE_API_BASE}/api/projects/${project?._id}/remove-member`,
         { userId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

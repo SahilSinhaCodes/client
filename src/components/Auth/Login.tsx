@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import toast from "react-hot-toast"; // ✅ import
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -18,7 +18,10 @@ const Login = () => {
     e.preventDefault();
     setError("");
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", formData);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE}/api/auth/login`,
+        formData
+      );
       const { token, user } = res.data;
 
       // Save login state globally

@@ -218,7 +218,7 @@ const TicketDetail = () => {
           <p className="text-sm text-gray-400 mb-1">Attached Image:</p>
           <div className="flex justify-center">
             <img
-              src={`http://localhost:5000${ticket.image}`}
+              src={`${import.meta.env.VITE_API_BASE}${ticket.image}`}
               alt="Ticket Attachment"
               className="max-w-sm w-full border border-gray-700 rounded"
             />

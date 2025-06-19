@@ -26,7 +26,7 @@ const Projects = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await axios.get("/api/projects", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE}/api/projects`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (Array.isArray(res.data)) {

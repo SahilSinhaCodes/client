@@ -47,7 +47,7 @@ const KanbanBoard = ({ tickets, setTickets}: Props) => {
 
     try {
       await axios.put(
-        `/api/tickets/${draggableId}`,
+        `${import.meta.env.VITE_API_BASE}/api/tickets/${draggableId}`,
         { status: updatedStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

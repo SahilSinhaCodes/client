@@ -49,7 +49,7 @@ const Tickets = () => {
         if (priority) query.append("priority", priority);
 
         const res = await axios.get(
-          `/api/tickets/project/${projectId}?${query.toString()}`,
+          `${import.meta.env.VITE_API_BASE}/api/tickets/project/${projectId}?${query.toString()}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -75,7 +75,7 @@ const Tickets = () => {
 
     try {
       const res = await axios.post(
-        "/api/tickets",
+        `${import.meta.env.VITE_API_BASE}/api/tickets`,
         { title, description, priority, assigneeEmail, projectId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

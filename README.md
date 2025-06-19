@@ -56,4 +56,4 @@ npm run dev
 - Responsive UI
 - Integrated with Bug Tracker API
 
-### Live Demo: [client-filame-ten.vercel.app](https://client-filame-ten.vercel.app)
+### Live Demo: [client-filame-ten.vercel.app](https://client-flame-ten.vercel.app)

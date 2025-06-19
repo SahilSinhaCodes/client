@@ -19,7 +19,9 @@ interface Ticket {
     email: string;
   };
   createdAt: string;
+  image?: string; // <-- Add this line
 }
+
 
 interface Comment {
   _id: string;
@@ -164,6 +166,67 @@ const TicketDetail = () => {
         <br />
         Assigned to: {ticket.assignee?.name || "Unassigned"}
       </p>
+      {isOwner && (
+  <div className="mt-6">
+    <p className="text-sm text-gray-400 mb-1">Upload Image:</p>
+    <div className="flex items-center gap-3">
+      <label
+        htmlFor="image-upload"
+        className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
+      >
+        Choose File
+      </label>
+      <input
+        id="image-upload"
+        type="file"
+        accept="image/*"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file || !ticket) return;
+
+          const formData = new FormData();
+          formData.append("image", file);
+
+          try {
+            const res = await axios.post(
+              `/api/tickets/${ticket._id}/upload-image`,
+              formData,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+            console.log("Image uploaded:", res.data);
+            setTicket({ ...ticket, image: res.data.image });
+          } catch (err) {
+            console.error("Failed to upload image", err);
+          }
+        }}
+        className="hidden"
+      />
+      {ticket.image && (
+        <span className="text-gray-300 text-sm">File selected</span>
+      )}
+    </div>
+  </div>
+)}
+
+      {ticket.image && (
+        <div className="mt-4">
+          <p className="text-sm text-gray-400 mb-1">Attached Image:</p>
+          <div className="flex justify-center">
+            <img
+              src={`http://localhost:5000${ticket.image}`}
+              alt="Ticket Attachment"
+              className="max-w-sm w-full border border-gray-700 rounded"
+            />
+          </div>
+        </div>
+      )}
+
+
 
       <hr className="border-gray-700 mb-6" />
 

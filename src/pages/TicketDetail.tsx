@@ -9,6 +9,7 @@ interface Ticket {
   description: string;
   priority: string;
   status: string;
+  projectId: string;
   assignee?: {
     name: string;
     email: string;
@@ -138,7 +139,7 @@ const TicketDetail = () => {
   if (loading) return <div className="p-6 text-white">Loading...</div>;
   if (!ticket) return <div className="p-6 text-white">Ticket not found</div>;
 
-  const isOwner = user?.id === ticket.createdBy._id;
+  const isOwner = user?._id === ticket.createdBy._id;
   console.log("Current user:", user);
   console.log("Is Owner:", isOwner);
 
@@ -241,7 +242,7 @@ const TicketDetail = () => {
               {comment.userId.name} • {new Date(comment.createdAt).toLocaleString()}
             </p>
             <p>{comment.text}</p>
-            {comment.userId._id === user?.id && (
+            {comment.userId._id === user?._id && (
               <button
                 onClick={() => handleDeleteComment(comment._id)}
                 className="text-red-400 text-xs mt-1"

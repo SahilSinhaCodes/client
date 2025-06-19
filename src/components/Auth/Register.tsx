@@ -25,11 +25,14 @@ const Register = () => {
       toast.success("Registered Successfully!");
       navigate("/login");
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || "Registration failed";
+      // 👇 More defensive check
+      const errorMsg =
+        err?.response?.data?.message || "Registration failed";
       setError(errorMsg);
       toast.error(errorMsg);
     }
   };
+  
 
   return (
     <div className="min-h-screen bg-stone-900 text-white flex items-center justify-center">
